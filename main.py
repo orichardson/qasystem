@@ -1,0 +1,49 @@
+import sys
+from magic import answerQuestions
+
+#inputfileN = sys.argv[1]
+inputFileN = 'test_input'
+
+inputFile = open(inputFileN, 'r')
+
+directory = inputFile.readline().replace('\n', '')
+
+for storyID in inputFile:
+    storyFile = open(directory+'/'+storyID+'.story', 'r')
+    qFile = open(directory+'/'+storyID+'.questions', 'r')
+
+    for line in storyFile:
+        if line.startswith('TEXT:'):
+            break
+
+    storyText = storyFile.read()
+
+    # Go through each quetion, and extract the question text.
+    # Consier a "question" to be an ordered tupple
+
+    questions = []
+
+    currentQ = {}
+    for line in qFile:
+        pieces = [i.strip() for i in line.split(':') ]
+
+        if len(pieces) == 2 and not (pieces[0] in currentQ) :
+            currentQ[pieces[0]] = pieces[1]
+        else:
+            questions.append(currentQ)
+            currentQ = {}
+            continue
+
+    #########################
+    ###   DO magic here   ###
+    #########################
+    answerQuestions(storyText, questions)
+
+    THINGSTOPRINT = ['QuestionID', 'Answer']
+    
+    for q in questions:
+        for attr in THINGSTOPRINT:
+            if attr in q:
+                print(attr+': '+q[attr])
+        print()
+        
