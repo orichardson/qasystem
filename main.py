@@ -1,8 +1,12 @@
 import sys
 from magic import answerQuestions
+import nltk
 
-#inputfileN = sys.argv[1]
-inputFileN = 'test_input'
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+inputFileN = sys.argv[1]
+#inputFileN = 'test_input'
 
 inputFile = open(inputFileN, 'r')
 
