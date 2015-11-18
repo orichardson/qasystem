@@ -5,8 +5,8 @@ import nltk
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
-inputFileN = sys.argv[1]
-#inputFileN = 'test_input'
+#inputFileN = sys.argv[1]
+inputFileN = 'test_input'
 
 inputFile = open(inputFileN, 'r')
 
@@ -42,7 +42,7 @@ for storyID in inputFile:
     #########################
     answerQuestions(storyText, questions)
 
-    THINGSTOPRINT = ['QuestionID', 'Answer']
+    THINGSTOPRINT = ['QuestionID', 'Answer', 'Question']
     
     for q in questions:
         for attr in THINGSTOPRINT:

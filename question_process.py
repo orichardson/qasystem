@@ -16,7 +16,7 @@ def question_process(q):
     text = q['Question'].lower().strip()
     words = text.split(' ');
     constr = [];
-    q['searchtype'] = 'unknown';
+    q['searchtype'] = 'NP';
         
     if words[0] == 'how':
         if words[1] == 'many' or words[2] == 'much' :

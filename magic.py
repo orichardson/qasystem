@@ -26,14 +26,21 @@ def makeScorer(q) :
             #if( node has property constr[0]) :
                 #dscore += constr[1] 
         
-        #Now, do general statistical weighting based on words
+        # Now, do general statistical weighting based on words
         words = node.root().leaves();
         common =  len([val for val in  q['assoc_verbs'] if val[0] in words])
-        common +=  len([val for val in  q['assoc_nouns'] if val[0] in words])
+        common +=  len([val for val in  q['assoc_nouns'] if val[0] in words])        
+
+        #print(words)
+        #print([val for val in  q['assoc_nouns'] if val[0] in words])
+        #print([val for val in  q['assoc_verbs'] if val[0] in words])
 
         score += 15*common;
         
-        score /= (10 + len(leaves))
+        score /= (20 + len(leaves))
+        score /= (10 + len(node.treeposition()))
+        
+        print(str(common)+'\t'+str(score)+'\t'+' '.join(leaves))
  
         #Check sores here.            
         if(score > q['bestscore']) :
