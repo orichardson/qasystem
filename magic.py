@@ -9,66 +9,66 @@ from libutils import *;
 def makeScorer(q) :
     q['bestscore'] = -1;
     q['bestans'] = 'No Answer'
-    
+
     def scorer(node):
         nodetext = node.label().strip();
         score = 0;
-        
+
         leaves = node.leaves();
 
-        #print(q['searchtype'] + '\t'+ nodetext+'\t'+str(q['searchtype']==nodetext));  
-        
+        #print(q['searchtype'] + '\t'+ nodetext+'\t'+str(q['searchtype']==nodetext));
+
         if 'searchtype' in q and (nodetext == q['searchtype']) :
             score += 10 ;
-        
+
         for constr in q['constraints'] :
             pass
             #if( node has property constr[0]) :
-                #dscore += constr[1] 
-        
+                #dscore += constr[1]
+
         # Now, do general statistical weighting based on words
         words = node.root().leaves();
         common =  len([val for val in  q['assoc_verbs'] if val[0] in words])
-        common +=  len([val for val in  q['assoc_nouns'] if val[0] in words])        
+        common +=  len([val for val in  q['assoc_nouns'] if val[0] in words])
 
         #print(words)
         #print([val for val in  q['assoc_nouns'] if val[0] in words])
         #print([val for val in  q['assoc_verbs'] if val[0] in words])
 
         score += 15*common;
-        
+
         score /= (20 + len(leaves))
         score /= (10 + len(node.treeposition()))
-        
-        print(str(common)+'\t'+str(score)+'\t'+' '.join(leaves))
- 
-        #Check sores here.            
+
+        #print(str(common)+'\t'+str(score)+'\t'+' '.join(leaves))
+
+        #Check sores here.
         if(score > q['bestscore']) :
             q['bestscore'] = score
             q['bestans'] = ' '.join(leaves)
-    
+
     return scorer
 
 def answerQuestions(story, questions):
     results = list(parse(story))
     trees = []
-    
+
     for root in results:
         for tree in root:
             #print(tree);
             #tree.draw();
             trees.append(nltk.ParentedTree.fromstring(tree.pformat()))
-            
-    
-    for q in questions: 
+
+
+    for q in questions:
         scorer = makeScorer(q);
         question_process(q);
-                
+
         for tree in trees:
             traverse(tree, scorer)
-                
+
         q['Answer'] = q['bestans'];
 
-        
-    print('all done!')
+
+    #print('all done!')
 

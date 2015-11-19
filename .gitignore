@@ -1,0 +1,4 @@
+stanford-ner/
+*.zip
+stanford-parser/
+__pycache__/

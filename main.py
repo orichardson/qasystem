@@ -2,17 +2,18 @@ import sys
 from magic import answerQuestions
 import nltk
 
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+#nltk.download('punkt')
+#nltk.download('averaged_perceptron_tagger')
 
-#inputFileN = sys.argv[1]
-inputFileN = 'test_input'
+inputFileN = sys.argv[1]
+#inputFileN = 'test_input'
 
 inputFile = open(inputFileN, 'r')
 
 directory = inputFile.readline().replace('\n', '')
 
 for storyID in inputFile:
+    storyID = storyID.replace('\n', '')
     storyFile = open(directory+'/'+storyID+'.story', 'r')
     qFile = open(directory+'/'+storyID+'.questions', 'r')
 
@@ -42,11 +43,11 @@ for storyID in inputFile:
     #########################
     answerQuestions(storyText, questions)
 
-    THINGSTOPRINT = ['QuestionID', 'Answer', 'Question']
-    
+    THINGSTOPRINT = ['QuestionID', 'Answer']
+
     for q in questions:
         for attr in THINGSTOPRINT:
             if attr in q:
                 print(attr+': '+q[attr])
         print()
-        
+
