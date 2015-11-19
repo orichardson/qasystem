@@ -50,5 +50,3 @@ for storyID in inputFile:
             if attr in q:
                 print(attr+': '+q[attr])
         print()
-
->>>>>>> eae33621344e60117b3397a414dc46c17f0be524
