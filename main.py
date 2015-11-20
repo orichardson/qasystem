@@ -4,7 +4,7 @@
 # - WordNet: animacy
 # - Get properties from:
 #  * adjectives, appositives, PPs, forms of 'to be',
-#      'to become', 'to turn into', etc., i.e. identity verbs
+#      'to become', 'to turn into',  etc., i.e. identity verbs
 # - Measurement Units? Make (or find) a map:
 #       Adjective -> type of quanity (length, weight, etc.)
 #       AND: unit --> type of quantity
