@@ -1,3 +1,8 @@
+#To do
+# - Coreference resolution + NP datastructure
+# - WordNet: animacy
+# - Get properties from adjectives, appositives, PPs
+
 import sys
 from magic import answerQuestions
 import nltk
@@ -43,7 +48,7 @@ for storyID in inputFile:
     #########################
     answerQuestions(storyText, questions)
 
-    THINGSTOPRINT = ['QuestionID', 'Answer']
+    THINGSTOPRINT = ['QuestionID', 'Question', 'Answer']
 
     for q in questions:
         for attr in THINGSTOPRINT:

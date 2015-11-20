@@ -1,4 +1,5 @@
 from nltk import *
+from libutils import *
 
 # In order to use these you need to have (from nltk.download() or wherever)
 # punkt
@@ -14,29 +15,33 @@ def part_of_speech_prefix(begins_with):
 
 def question_process(q):
     text = q['Question'].lower().strip()
-    words = text.split(' ');
+    tree = parse(text)[0];
+
+    print(tree)
+
+    words = tree.leaves();
     constr = [];
     q['searchtype'] = 'NP';
-        
+
     if words[0] == 'how':
         if words[1] == 'many' or words[2] == 'much' :
             constr.append(('QUANTITY', 10))
-                
+
     elif words[0] == 'where':
         constr.append('LOCATION')
         q['searchtype'] = 'NP'
-        
+
     elif words[0] == 'what':
         q['searchtype'] = 'NP'
-        
+
     elif words[0] == 'who':
         constr.append(('PERSON', 10))
         constr.append(('ORGANIZATION', 2))
         q['searchtype'] = 'NP'
-        
+
     elif words[0] == 'why':
         constr.append(('REASON', 5))
-    
+
     tagged = pos_tag(word_tokenize(text))
     q['assoc_nouns'] = list(filter(part_of_speech_prefix('NN'), tagged))
     q['assoc_verbs'] = list(filter(part_of_speech_prefix('VB'), tagged))

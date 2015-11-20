@@ -12,13 +12,15 @@ def makeScorer(q) :
 
     def scorer(node):
         nodetext = node.label().strip();
+        nodedata = nodetext.split('|')
+
         score = 0;
 
         leaves = node.leaves();
 
         #print(q['searchtype'] + '\t'+ nodetext+'\t'+str(q['searchtype']==nodetext));
 
-        if 'searchtype' in q and (nodetext == q['searchtype']) :
+        if 'searchtype' in q and (nodedata[0] ==q['searchtype']) :
             score += 10 ;
 
         for constr in q['constraints'] :
@@ -50,15 +52,13 @@ def makeScorer(q) :
     return scorer
 
 def answerQuestions(story, questions):
-    results = list(parse(story))
-    trees = []
+    trees = parse(story)
 
-    for root in results:
-        for tree in root:
-            #print(tree);
-            #tree.draw();
-            trees.append(nltk.ParentedTree.fromstring(tree.pformat()))
-
+    for tree in trees:
+        labels = st.tag(tree.leaves())
+        tagger = maketagger(labels)
+        traverse(tree, tagger)
+        print(tree)
 
     for q in questions:
         scorer = makeScorer(q);
