@@ -1,7 +1,15 @@
 #To do
 # - Coreference resolution + NP datastructure
+# - Maybe: full chart parse with constituents, so we can be wrong
 # - WordNet: animacy
-# - Get properties from adjectives, appositives, PPs
+# - Get properties from:
+#  * adjectives, appositives, PPs, forms of 'to be',
+#      'to become', 'to turn into', etc., i.e. identity verbs
+# - Measurement Units? Make (or find) a map:
+#       Adjective -> type of quanity (length, weight, etc.)
+#       AND: unit --> type of quantity
+#
+# Preprocessing: remove commas from measurements
 
 import sys
 from magic import answerQuestions

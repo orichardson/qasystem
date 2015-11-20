@@ -12,6 +12,12 @@ def part_of_speech_prefix(begins_with):
 #To do:
 # Add some metric for finding more relevant nouns and verbs.
 # Use a parser to get prepositional phrases directly
+# Ignore first verb phrase inside an SQ; it's just a connector
+
+# Constraint types:
+#  -- prepositional phrases attached to the WH-pronoun
+#  -- noun phrases after WHD (Wh-determiner)
+#  --
 
 def question_process(q):
     text = q['Question'].lower().strip()
