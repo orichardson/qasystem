@@ -18,9 +18,6 @@ def makeScorer(q, sb) :
         if 'searchtype' in q and (nodedata[0] ==q['searchtype']) :
             score += 10 ;
             
-
-        
-
         for constr in q['constraints'] :
             pass
             #if( node has property constr[0]) :
