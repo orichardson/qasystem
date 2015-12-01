@@ -50,11 +50,16 @@ def bagSimilarity(s1, s2) :
     
 def semanticDist(texts1, texts2):
     s1 = set()
+    s2 = set()
     
     for t in texts1:
-        s1 |= set([lexclass(x, t) for x in t.split()])
+        for q in t.split():
+            s1 |= lexclass(q, t)
     for t in texts2:
-        s2 |= set([lexclass(x, t) for x in t.split()])
+        for q in t.split():
+            s2 |= lexclass(q, t)
+        
+    return bagSimilarity(s1, s2)
 
 
 def traverse(t, f, pre=False):
