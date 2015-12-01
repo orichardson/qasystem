@@ -1,0 +1,5 @@
+person	1
+number	3
+gender	3
+lexname	6
+lexsim	4

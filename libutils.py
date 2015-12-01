@@ -1,23 +1,35 @@
-import nltk
-import os
+import nltk, os, math
 
 from nltk.tag.stanford import StanfordNERTagger
 st = StanfordNERTagger('stanford-ner/classifiers/english.muc.7class.distsim.crf.ser.gz', 'stanford-ner/stanford-ner.jar')
 
 from nltk.parse import stanford
+
 #nltk.internals.config_java(options='-xmx2G')
 os.environ['STANFORD_PARSER'] = 'stanford-parser/stanford-parser.jar'
 os.environ['STANFORD_MODELS'] = 'stanford-parser/stanford-parser-3.5.2-models.jar'
 
 parser = stanford.StanfordParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 
-def traverse(t, f):
+def traverse(t, f, pre=False):
     if isinstance(t, nltk.Tree) :
         # Now we know that t.node is defined
+        if pre:
+            f(t)
+            
         for child in t:
             traverse(child,f)
-        f(t)
-
+        
+        if not pre:
+            f(t)
+            
+def findLeftNode(t) :
+    if isinstance(t, nltk.Tree):
+        if len(t) :
+            n = findLeftNode(t[0])
+            return n if n else t
+        return t
+    return None
 
 def parse(string):
     split = [ s.replace('\n', ' ') for s in nltk.sent_tokenize(string)]
@@ -27,31 +39,73 @@ def parse(string):
 
     for root in rslt:
         for tree in root:
+            #trees.append(tree)
             trees.append(nltk.ParentedTree.fromstring(tree.pformat()))
 
     return trees;
+    
 
 
 def maketagger(labels):
     labels.reverse()
-    def nertag(node) :
+    
+    def nertagger(node) :
         l = node.label()
 
         if len(node) == 1 and isinstance(node[0], str) :
-            #Maybe we should check that labels.pop()[0] == node[0]
-            kind = labels.pop()[1];
-            if(kind != 'O') :
-                node.set_label(l+'|'+kind+'')
+            # We are now checking that labels.pop()[0] == node[0]
+            newlabel = labels.pop();
+            
+            if(l == newlabel[0]) :
+                node.nertag = newlabel[1];
+                
         elif l.startswith('N') :
             # Do the last one, not the most common one. Head nouns.
-            things = node[-1].label().split('|')
-            if len(things) > 1:
-                final = things[1]
-                node.set_label(l+'|'+final+'')
+            node.nertag = getattr(node[-1], 'nertag', 'O')
+            
+    return nertagger
 
-    return nertag
+"""
+This method was taken almost entirely from a wikipedia page with edit
+distance code in many different languages
+"""
+def levenshtein(s1, s2) :
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
 
+    if len(s2) == 0:
+        return len(s1)
 
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+    
+    return previous_row[-1]
+    
+"""
+... and this is why we need it. 
+Returns lexical similarity between two strings (0-1)
+Edit distance + Acronyms + other ways of co-referring to strings
+where semantics and syntax don't help at all (using just first names, etc.)
+"""
+def lexsim(s1, s2):
+    dist = levenshtein(s1,s2)
+
+    #Now do fancy acronym and missing word / reordering things to add score.
+    amelioration = 2 # should be greater for reorderings, less for egregious mistakes
+    
+    # and now to clamp it to the appropriate range:
+    return 1/(1 + dist/amelioration)
+    
+
+    
+    
 #trees = []
 #for i in parse('I am a sentence at Apple, Co.'):
 #    for j in i:

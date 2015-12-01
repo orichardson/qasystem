@@ -2,6 +2,7 @@
 
 from question_process import question_process
 from libutils import *;
+import analyst
 
 #nltk.download('punkt')
 #nltk.download('averaged_perceptron_tagger')
@@ -12,8 +13,6 @@ def makeScorer(q) :
 
     def scorer(node):
         nodetext = node.label().strip();
-        nodedata = nodetext.split('|')
-
         score = 0;
 
         leaves = node.leaves();
@@ -63,6 +62,11 @@ def answerQuestions(story, questions):
     for q in questions:
         scorer = makeScorer(q);
         question_process(q);
+        
+        global stry
+        stry = analyst.Story()
+        sb = analyst.StoryBuilder(stry)
+        sb.read(trees)
 
         for tree in trees:
             traverse(tree, scorer)

@@ -1,0 +1,9 @@
+VALUES	person	number	gender
+
+PERSON	3	sp	mf
+ORGANIZATION	3	sp	n
+TIME	3	s	n
+DATE	3	s	n
+MONEY	3	sp	n
+PERCENT	3	p	n
+LOCATION	3	sp	n
