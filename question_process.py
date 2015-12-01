@@ -20,8 +20,10 @@ def part_of_speech_prefix(begins_with):
 #  -- noun phrases after WHD (Wh-determiner)
 #  --
 
+from lawyer import get as lget
+
 QPOSMAP = {'WHNP':'NP', 'WHAVP':'NP', 'WHADJP':'ADJP', 'WHPP':'PP'}
-ALL_NOUNS = lawyer.get('lexname_constraints').keys() - {'VALUES'}
+ALL_NOUNS = lget('lexname_constraints').keys() - {'VALUES'}
 
 def question_process(q):
     text = q['Question'].strip()
