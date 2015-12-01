@@ -40,6 +40,7 @@ class SObj:
 
     def __init__(self, stry, node):
         self.story = stry
+        self.priority = 1
 
         #Two-way reference, just to be safe.
         node.obj = self
@@ -64,6 +65,7 @@ class SObj:
         if hasattr(self,'nertag') :
             lawyer.addConstraints('ner_constraints', self.props, self.nertag)
             self.props['ner'] = self.nertag
+            self.priority = 0.5
         # Step (2) : Verbs:
         # Note that, unlike nouns, where the head noun is at the end,
         # the conjugated verb always comes first in a verb phrase.
@@ -160,17 +162,25 @@ class Pronoun(SObj):
             self.props['number'] = {'s'}
             self.props['gender'] = {'m'}
             self.props['lexname'] = {'noun.person'}
+            self.priority = 1000;
         elif content == 'she' or content == 'her':
             self.props['person'] = {'3'}
             self.props['number'] = {'s'}
             self.props['gender'] = {'f'}
             self.props['lexname'] = {'noun.person'}
+            self.priority = 1000;
         elif content == 'they' or content == 'them':
             self.props['person'] = {'3'}
             self.props['number'] = {'p'}
             self.props['lexname'] = {'noun.group'}
-
-
+            self.priority = 50;
+        elif content == 'it':
+            self.props['person'] = {'3'}
+            self.props['number'] = {'p'}
+            self.props['gender'] = {'n'}
+            self.priority = 10;
+        else:
+            self.priority = 5;
 
 class StoryBuilder:
     MERGE_THRESHOLD = 6
@@ -194,7 +204,7 @@ class StoryBuilder:
                 maxo = o
                 maxsim = v
 
-        if maxsim > StoryBuilder.MERGE_THRESHOLD:
+        if maxsim > StoryBuilder.MERGE_THRESHOLD / given.priority:
             print('merging because of score : ', maxsim, maxo.texts, maxo.props, given.texts, given.props,sep='\n')
             maxo.merge(given)
             return maxo
@@ -213,7 +223,7 @@ class StoryBuilder:
     def makeReader(self):
         def reader(node):
             tag = node.label();
-            
+
             if(tag == 'NP'):
                 # Need to check how necessary this is to resolve:
                 # High priority: her, hers, she, he,
@@ -223,7 +233,7 @@ class StoryBuilder:
                 # First, check for apositive construction;
                 # otherwise, if this is a lowest level NP, resolveee.
                 m = getMatches(StoryBuilder.CGRAMMAR, node)
-                
+
                 # Check that this is not a list
                 if 'APPOSITIVE' in m :
                     # because it's a postorder traversal, our children already
@@ -233,7 +243,7 @@ class StoryBuilder:
 
                 if len(list(node.subtrees(filter=lambda x: x.label()=='NP') )) == 1 :
                     thing = self.resolve(SObj(self.story, node))
-                for i in node.subtrees(filter=lambda x: x.label() == 'PRP'):
+                for i in node.subtrees(filter=lambda x: x.label() in ['PRP', 'PRP$', 'WP', 'WP$']):
                     thing = self.resolve(Pronoun(self.story, i))
 
         return reader
