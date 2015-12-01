@@ -138,7 +138,6 @@ class Pronoun(SObj):
     def __init__(self, stry, node):
         super(Pronoun, self).__init__(stry, node)
         content = node[0].lower()
-        label = node.label()
         if content == 'he' or content == 'him':
             self.props['person'] = {'3'}
             self.props['number'] = {'s'}
