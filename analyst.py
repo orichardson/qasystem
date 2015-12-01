@@ -87,11 +87,15 @@ class SObj:
     def compatibility(self, other): # Could these two nodes co-refer?
         score = 0
         
-        for prop in self.props.keys() & other.props.keys():
+        joint = self.props.keys() & other.props.keys()
+        
+        for prop in joint:
             if self.props[prop] & other.props[prop]:
                 score += SObj.WORTH[prop]
             else :
                 score -= SObj.WORTH[prop]
+        
+        score /= len(joint)
         
         maxv = 0
         for t1 in self.texts:
@@ -100,10 +104,15 @@ class SObj:
                 if(v > maxv):
                     maxv = v
         
-        score += maxv*SObj.WORTH['lexsim']
+        nproper = 0;
         
-        #print(self.texts[0]+",\t,"+other.texts[0])
-        #print(score)
+        for t in self.trees+other.trees:
+            count = len(list(t.subtrees(filter=lambda n: n.label() in ['NNP', 'NNPS'])))
+            nproper += count / len(t.leaves())
+
+        score += maxv*SObj.WORTH['lexsim']*nproper
+        
+        #print(self.texts[0], other.texts[0], score, sep='\t')
         
         return score
         
@@ -127,7 +136,8 @@ class SObj:
         
 
 class StoryBuilder:
-    MERGE_THRESHOLD = 0.5    
+    MERGE_THRESHOLD = 6
+    CGRAMMAR = lawyer.get('patterns')
     
     def __init__(self, story=Story()):
         self.story = story
@@ -148,6 +158,7 @@ class StoryBuilder:
                 maxsim = v
         
         if maxsim > StoryBuilder.MERGE_THRESHOLD:
+            print('merging because of score : ', maxsim, maxo.texts, given.texts)
             maxo.merge(given)
             return maxo
         else:
@@ -165,12 +176,21 @@ class StoryBuilder:
     def makeReader(self):
         def reader(node):
             tag = node.label();
+            
             if(tag == 'NP'):
-                thing = self.resolve(SObj(self.story, node))
-                self.story.obj.append(thing)
-            elif(tag == 'PRP'):
-                #thing = self.resolve()
-                pass
+                # First, check for apositive construction;                
+                # otherwise, if this is a lowest level NP, resolveee.
+                m = getMatches(StoryBuilder.CGRAMMAR, node)
+                
+                    
+                if 'APPOSITIVE' in m :
+                    # because it's a postorder traversal, our children already
+                    # live in the story obj list...
+                    print('merging because appositive')
+                    node[0].obj.merge(node[2].obj)
+                        
+                if len(list(node.subtrees(filter=lambda x: x.label()=='NP') )) == 1 :
+                    thing = self.resolve(SObj(self.story, node))
             
         return reader
             

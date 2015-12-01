@@ -30,6 +30,18 @@ def findLeftNode(t) :
             return n if n else t
         return t
     return None
+    
+def getMatches(grammar, node):
+    matches = set()
+    
+    for g in grammar.keys():
+        # risky business here: use in, or is? Do we need exact match?
+        if ' '.join(grammar[g]) is ' '.join([x.label()  for x in node if isinstance(x,nltk.Tree)]):
+            matches.add(g)
+    
+    return matches
+
+    
 
 def parse(string):
     split = [ s.replace('\n', ' ') for s in nltk.sent_tokenize(string)]
