@@ -12,6 +12,8 @@ os.environ['STANFORD_MODELS'] = 'stanford-parser/stanford-parser-3.5.2-models.ja
 parser = stanford.StanfordParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet as wn
+from nltk.wsd import lesk
 
 wnl = WordNetLemmatizer()
 
@@ -20,8 +22,39 @@ def isplural(word):
     plural = True if word is not lemma else False
     return plural, lemma
     
+def lexclass(word, context=''):
+    # TODO: word sense disambiguation, pass optional context to lexclass.
+    rslt = set()
+
+    if context:
+        sense = lesk(context,word);
+        if sense:
+            rslt.add(sense.lexname())
+            return rslt
+
+    sets = wn.synsets(word, pos=wn.NOUN)
+    for s in sets:
+        rslt.add(s.lexname())
+
+    return rslt
+    
+def bagSimilarity(s1, s2) :
+    total = 0;
+    
+    for a in s1:
+        for b in s2:
+            total += wn.lch_similarity(a,b)
+            
+    total /= (len(s1)*len(s2))
+    return total
+    
 def semanticDist(texts1, texts2):
-    return 1
+    s1 = set()
+    
+    for t in texts1:
+        s1 |= set([lexclass(x, t) for x in t.split()])
+    for t in texts2:
+        s2 |= set([lexclass(x, t) for x in t.split()])
 
 
 def traverse(t, f, pre=False):

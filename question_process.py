@@ -31,7 +31,7 @@ def question_process(q):
     # Make a bag of semantic relation for lch_distance via wordnet    
     semanticbag = set()    
     for w in words:
-        semanticbag |= analyst.lexclass(w, text)
+        semanticbag |= lexclass(w, text)
     q['semanticbag'] = semanticbag;
         
     sbarq = tree[0]
@@ -44,7 +44,7 @@ def question_process(q):
         sobj = analyst.Pronoun(Story(), gap[0])
         
         if ismatch(['WDT' 'NN'], gap) :
-            sobj.props['lexname'] = analyst.lexclass(' '.join(gap[1].leaves()))
+            sobj.props['lexname'] = lexclass(' '.join(gap[1].leaves()))
         elif ismatch(['WRB', 'JJ']):
             #So this is a 'how tall' question
             sobj.props['lexname'] = {'noun.quantity'}

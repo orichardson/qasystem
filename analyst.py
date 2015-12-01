@@ -2,26 +2,8 @@
 @author: Oliver
 """
 
-from nltk.corpus import wordnet as wn
-from nltk.wsd import lesk
 from libutils import *
 import lawyer
-
-def lexclass(word, context=''):
-    # TODO: word sense disambiguation, pass optional context to lexclass.
-    rslt = set()
-
-    if context:
-        sense = lesk(context,word);
-        if sense:
-            rslt.add(sense.lexname())
-            return rslt
-
-    sets = wn.synsets(word, pos=wn.NOUN)
-    for s in sets:
-        rslt.add(s.lexname())
-
-    return rslt
 
 
 class Story:
