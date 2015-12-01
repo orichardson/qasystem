@@ -11,6 +11,19 @@ os.environ['STANFORD_MODELS'] = 'stanford-parser/stanford-parser-3.5.2-models.ja
 
 parser = stanford.StanfordParser(model_path="edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 
+from nltk.stem import WordNetLemmatizer
+
+wnl = WordNetLemmatizer()
+
+def isplural(word):
+    lemma = wnl.lemmatize(word, 'n')
+    plural = True if word is not lemma else False
+    return plural, lemma
+    
+def semanticDist(texts1, texts2):
+    return 1
+
+
 def traverse(t, f, pre=False):
     if isinstance(t, nltk.Tree) :
         # Now we know that t.node is defined

@@ -35,7 +35,8 @@ class Story:
 class SObj:
     # TODO: train perceptron on these.
     WORTH = lawyer.faireValoir()
-    
+    SINGULAR_POS = ['NNP', 'NN', 'DT', 'VBZ']
+    PLURAL_POS = ['NNS', 'NNPS', 'CD', 'VBP' ]
     
     def __init__(self, stry, node):
         self.story = stry        
@@ -62,8 +63,7 @@ class SObj:
         # Step (2) : NER agreement:
         if hasattr(self,'nertag') :
             lawyer.addConstraints('ner_constraints', self.props, self.nertag)
-
-        # Step (3) : Verbs: 
+        # Step (2) : Verbs: 
         # Note that, unlike nouns, where the head noun is at the end,
         # the conjugated verb always comes first in a verb phrase.
         nextpart = node.right_sibling()
@@ -76,9 +76,20 @@ class SObj:
             
             elif(vpos == 'VBP') :
                 if 'number' in self.props:
-                    self.props['number'] -= {'s'}
+                    #self.props['number'] -= {'s'}
+                    pass
                     # Technically, it could be non-3rd person as well, but
                     # news articles are very 3rd person-y.
+        
+        # Step (4) : parse agreement
+        nsing = len([x[0] for x in node.pos() if x[1] in SObj.SINGULAR_POS])
+        npl = len([x[0] for x in node.pos() if x[1] in SObj.PLURAL_POS])
+        
+        if(nsing + npl > len(leaves)/3) :
+            if nsing > npl :
+                self.props['number'] = {'s'}
+            else :
+                self.props['number'] = {'p'}
 
         
     def attrcollector(node) : # another traversal function, collects PPs and JJ's
@@ -90,12 +101,16 @@ class SObj:
         joint = self.props.keys() & other.props.keys()
         
         for prop in joint:
-            if self.props[prop] & other.props[prop]:
-                score += SObj.WORTH[prop]
+            intersect = len(self.props[prop] & other.props[prop])
+            union = len(self.props[prop] | other.props[prop])
+            
+            # Jaccard similarity!
+            if intersect:
+                score += SObj.WORTH[prop] * (intersect/union)
             else :
-                score -= SObj.WORTH[prop]
+                score -= SObj.WORTH[prop] * StoryBuilder.PENALTY_MULTIPLIER
         
-        score /= len(joint)
+        #score /= len(joint)
         
         maxv = 0
         for t1 in self.texts:
@@ -108,9 +123,12 @@ class SObj:
         
         for t in self.trees+other.trees:
             count = len(list(t.subtrees(filter=lambda n: n.label() in ['NNP', 'NNPS'])))
-            nproper += count / len(t.leaves())
-
+            nproper += count / len(list(t.subtrees()))
+            
         score += maxv*SObj.WORTH['lexsim']*nproper
+        
+        # Now scale by total semantic distance
+        score /= semanticDist(self.texts, other.texts)
         
         #print(self.texts[0], other.texts[0], score, sep='\t')
         
@@ -138,6 +156,7 @@ class SObj:
 class StoryBuilder:
     MERGE_THRESHOLD = 6
     CGRAMMAR = lawyer.get('patterns')
+    PENALTY_MULTIPLIER = 10
     
     def __init__(self, story=Story()):
         self.story = story
@@ -158,7 +177,7 @@ class StoryBuilder:
                 maxsim = v
         
         if maxsim > StoryBuilder.MERGE_THRESHOLD:
-            print('merging because of score : ', maxsim, maxo.texts, given.texts)
+            print('merging because of score : ', maxsim, maxo.texts, maxo.props, given.texts, given.props,sep='\n')
             maxo.merge(given)
             return maxo
         else:
