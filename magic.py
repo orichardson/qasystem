@@ -7,20 +7,19 @@ import analyst
 #nltk.download('punkt')
 #nltk.download('averaged_perceptron_tagger')
 
-def makeScorer(q) :
+def makeScorer(q, sb) :
     q['bestscore'] = -1;
     q['bestans'] = 'No Answer'
 
     def scorer(node):
-        nodetext = node.label().strip();
         score = 0;
-
-        leaves = node.leaves();
-
         #print(q['searchtype'] + '\t'+ nodetext+'\t'+str(q['searchtype']==nodetext));
 
         if 'searchtype' in q and (nodedata[0] ==q['searchtype']) :
             score += 10 ;
+            
+
+        
 
         for constr in q['constraints'] :
             pass
@@ -57,21 +56,18 @@ def answerQuestions(story, questions):
         labels = st.tag(tree.leaves())
         tagger = maketagger(labels)
         traverse(tree, tagger)
-        print(tree)
 
     for q in questions:
         scorer = makeScorer(q);
         question_process(q);
-        
-        global stry
-        stry = analyst.Story()
-        sb = analyst.StoryBuilder(stry)
+
+        sb = analyst.StoryBuilder()
         sb.read(trees)
+        
+        tofind = analyst.SObj(sb.story, node)
+        sb.resolve(tofind)
 
         for tree in trees:
             traverse(tree, scorer)
 
         q['Answer'] = q['bestans'];
-
-
-    #print('all done!')

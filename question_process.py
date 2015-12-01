@@ -1,5 +1,6 @@
 from nltk import *
 from libutils import *
+import analyst
 
 # In order to use these you need to have (from nltk.download() or wherever)
 # punkt
@@ -19,39 +20,60 @@ def part_of_speech_prefix(begins_with):
 #  -- noun phrases after WHD (Wh-determiner)
 #  --
 
+QPOSMAP = {'WHNP':'NP', 'WHAVP':'NP', 'WHADJP':'ADJP', 'WHPP':'PP'}
+ALL_NOUNS = lawyer.get('lexname_constraints').keys() - {'VALUES'}
+
 def question_process(q):
-    text = q['Question'].lower().strip()
+    text = q['Question'].strip()
     tree = parse(text)[0];
-
-    print(tree)
-
     words = tree.leaves();
-    constr = [];
-    q['searchtype'] = 'NP';
 
-    if words[0] == 'how':
-        if words[1] == 'many' or words[2] == 'much' :
-            constr.append(('QUANTITY', 10))
+    # Make a bag of semantic relation for lch_distance via wordnet    
+    semanticbag = set()    
+    for w in words:
+        semanticbag |= analyst.lexclass(w, text)
+    q['semanticbag'] = semanticbag;
+        
+    sbarq = tree[0]
+    gap = sbarq.subtrees(filter=lambda n:n.label() in QPOSMAP.keys() ).next()
+    
+    if gap:    
+        q['searchtype'] = QPOSMAP[gap.label()];
+        
+        
+        sobj = analyst.Pronoun(Story(), gap[0])
+        
+        if ismatch(['WDT' 'NN'], gap) :
+            sobj.props['lexname'] = analyst.lexclass(' '.join(gap[1].leaves()))
+        elif ismatch(['WRB', 'JJ']):
+            #So this is a 'how tall' question
+            sobj.props['lexname'] = {'noun.quantity'}
+            
+            # w2 = gap.leaves()[1].lower()
+            # sobj.props['dimension'] = dimension.fromWord(w2)
+            
+        elif ismatch(['WRB'], gap) :
+            word = gap.leaves()[0].lower()
+            
+            if word == 'where':
+                sobj.props['lexname'] = {'noun.location'}
+                sobj.props['ner'] = {'LOCATION'}
+            elif word == 'when':
+                sobj.props['lexname'] = {'noun.time'}
+                sobj.props['ner'] = {'DATE', 'TIME'}
+            elif word == 'why':
+                sobj.props['lexname'] = {'noun.reason'}
+        
+        elif ismatch(['WP'], gap) :
+            # so there's only one node
+            word = gap.leaves()[0].lower()
+            if word == 'who' :
+                sobj.props['ner'] = {'PERSON', 'ORGANIZATION'}
+                sobj.props['lexname'] = {'noun.person'}
+            elif word == 'what' :
+                sobj.props['lexname'] = ALL_NOUNS - {'noun.person'}
 
-    elif words[0] == 'where':
-        constr.append('LOCATION')
-        q['searchtype'] = 'NP'
-
-    elif words[0] == 'what':
-        q['searchtype'] = 'NP'
-
-    elif words[0] == 'who':
-        constr.append(('PERSON', 10))
-        constr.append(('ORGANIZATION', 2))
-        q['searchtype'] = 'NP'
-
-    elif words[0] == 'why':
-        constr.append(('REASON', 5))
-
-    tagged = pos_tag(word_tokenize(text))
-    q['assoc_nouns'] = list(filter(part_of_speech_prefix('NN'), tagged))
-    q['assoc_verbs'] = list(filter(part_of_speech_prefix('VB'), tagged))
-    q['constraints'] = constr;
-
+        q['sobj'] = sobj
+        
 #Sample test
 #print(question_process("Who did the Queen of England pour mustard on at dinner?"))

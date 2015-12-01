@@ -44,12 +44,15 @@ def findLeftNode(t) :
         return t
     return None
     
+def ismatch(ltags, node) :
+    return ' '.join(ltags) is ' '.join([x.label()  for x in node if isinstance(x,nltk.Tree)])
+    
 def getMatches(grammar, node):
     matches = set()
     
     for g in grammar.keys():
         # risky business here: use in, or is? Do we need exact match?
-        if ' '.join(grammar[g]) is ' '.join([x.label()  for x in node if isinstance(x,nltk.Tree)]):
+        if ismatch(grammar[g], node) :
             matches.add(g)
     
     return matches

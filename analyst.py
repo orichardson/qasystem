@@ -128,7 +128,7 @@ class SObj:
         score += maxv*SObj.WORTH['lexsim']*nproper
         
         # Now scale by total semantic distance
-        score /= semanticDist(self.texts, other.texts)
+        score /= 1+semanticDist(self.texts, other.texts)
         
         #print(self.texts[0], other.texts[0], score, sep='\t')
         
@@ -196,12 +196,13 @@ class StoryBuilder:
         def reader(node):
             tag = node.label();
             
+            #TODO
             if(tag == 'NP'):
                 # First, check for apositive construction;                
                 # otherwise, if this is a lowest level NP, resolveee.
                 m = getMatches(StoryBuilder.CGRAMMAR, node)
                 
-                    
+                # Check that this is not a list
                 if 'APPOSITIVE' in m :
                     # because it's a postorder traversal, our children already
                     # live in the story obj list...
