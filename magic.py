@@ -17,14 +17,15 @@ def makeScorer(q) :
 
         if 'searchtype' in q and (node.label() ==q['searchtype']) :
             score += 20 ;
-            
-        if hasattr(node, 'obj') and 'sobj' in q:
-            score += 5*node.obj.compatibility(q['sobj'])
-            
+                        
         leaves = node.leaves()
 
         score /= (20 + len(leaves))
         score /= (10 + len(node.treeposition()))
+
+        if hasattr(node, 'obj') and 'sobj' in q:
+            score *= node.obj.compatibility(q['sobj'])
+
 
         #print(str(common)+'\t'+str(score)+'\t'+' '.join(leaves))
 
@@ -42,13 +43,14 @@ def answerQuestions(story, questions):
         labels = st.tag(tree.leaves())
         tagger = maketagger(labels)
         traverse(tree, tagger)
+        print(tree)
+
+    sb = analyst.StoryBuilder()
+    sb.read(trees)
 
     for q in questions:
         scorer = makeScorer(q);
         question_process(q);
-
-        sb = analyst.StoryBuilder()
-        sb.read(trees)
         
         for tree in trees:
             traverse(tree, scorer)

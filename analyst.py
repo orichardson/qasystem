@@ -165,7 +165,7 @@ class Pronoun(SObj):
             self.priority = 5;
 
 class StoryBuilder:
-    MERGE_THRESHOLD = 6
+    MERGE_THRESHOLD = 30
     CGRAMMAR = lawyer.get('patterns')
     PENALTY_MULTIPLIER = 10
 
@@ -187,6 +187,11 @@ class StoryBuilder:
                 maxsim = v
 
         if maxsim > StoryBuilder.MERGE_THRESHOLD / given.priority:
+            print('merging, with priority '+str(maxsim)+' ('+str(StoryBuilder.MERGE_THRESHOLD / given.priority)+' needed)')
+            print(maxo.texts)
+            print(given.texts)
+            print(maxo.props)
+            print(given.props)
             maxo.merge(given)
             return maxo
         else:
@@ -197,7 +202,8 @@ class StoryBuilder:
     # call this with each tree, to build a story structure
     def read(self, trees) :
         r = self.makeReader()
-        for tree in trees :
+        for (i,tree) in enumerate(trees) :
+            print('********************* TREE '+str(i)+ ' COMPLETE! **************')
             traverse(tree,r)
 
 
