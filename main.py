@@ -14,8 +14,8 @@
 import sys
 from magic import answerQuestions
 
-#inputFileN = sys.argv[1]
-inputFileN = 'test_input'
+inputFileN = sys.argv[1]
+#inputFileN = 'test_input'
 
 inputFile = open(inputFileN, 'r')
 
