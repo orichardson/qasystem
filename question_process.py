@@ -43,11 +43,11 @@ def question_process(q):
         q['searchtype'] = QPOSMAP[gap.label()];
         
         
-        sobj = analyst.Pronoun(Story(), gap[0])
+        sobj = analyst.Pronoun(analyst.Story(), gap[0])
         
         if ismatch(['WDT' 'NN'], gap) :
             sobj.props['lexname'] = lexclass(' '.join(gap[1].leaves()))
-        elif ismatch(['WRB', 'JJ']):
+        elif ismatch(['WRB', 'JJ'], gap):
             #So this is a 'how tall' question
             sobj.props['lexname'] = {'noun.quantity'}
             

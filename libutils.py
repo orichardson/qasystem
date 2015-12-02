@@ -27,7 +27,7 @@ def lexsense(word, context='') :
     if context:
         sense = lesk(context,word);
         if sense:
-            return set(sense)
+            return {sense}
 
     return set(wn.synsets(word, pos=wn.NOUN))
 
@@ -47,6 +47,9 @@ def lexclass(word, context=''):
     return rslt
 
 def bagSimilarity(s1, s2) :
+    if(len(s1) == 0 and len(s2) == 0) :
+        return 1
+        
     total = 0;
 
     for a in s1:
@@ -66,7 +69,7 @@ def semSim(texts1, texts2):
             s1 |= lexsense(q, t)
     for t in texts2:
         for q in t.split():
-            s2 |= lexclass(q, t)
+            s2 |= lexsense(q, t)
 
     return bagSimilarity(s1, s2)
 
