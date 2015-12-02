@@ -7,7 +7,7 @@ import analyst
 #nltk.download('punkt')
 #nltk.download('averaged_perceptron_tagger')
 
-def makeScorer(q, sb) :
+def makeScorer(q) :
     q['bestscore'] = -1;
     q['bestans'] = 'No Answer'
 
@@ -16,23 +16,10 @@ def makeScorer(q, sb) :
         #print(q['searchtype'] + '\t'+ nodetext+'\t'+str(q['searchtype']==nodetext));
 
         if 'searchtype' in q and (nodedata[0] ==q['searchtype']) :
-            score += 10 ;
+            score += 20 ;
             
-        for constr in q['constraints'] :
-            pass
-            #if( node has property constr[0]) :
-                #dscore += constr[1]
-
-        # Now, do general statistical weighting based on words
-        words = node.root().leaves();
-        common =  len([val for val in  q['assoc_verbs'] if val[0] in words])
-        common +=  len([val for val in  q['assoc_nouns'] if val[0] in words])
-
-        #print(words)
-        #print([val for val in  q['assoc_nouns'] if val[0] in words])
-        #print([val for val in  q['assoc_verbs'] if val[0] in words])
-
-        score += 15*common;
+        if hasattr(node, 'obj'):
+            score += 5*node.obj.compatibility(q['sobj'])
 
         score /= (20 + len(leaves))
         score /= (10 + len(node.treeposition()))
@@ -53,6 +40,7 @@ def answerQuestions(story, questions):
         labels = st.tag(tree.leaves())
         tagger = maketagger(labels)
         traverse(tree, tagger)
+        print(tree)
 
     for q in questions:
         scorer = makeScorer(q);
