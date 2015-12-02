@@ -15,14 +15,14 @@ import sys
 from magic import answerQuestions
 
 inputFileN = sys.argv[1]
-#inputFileN = 'test_input'
+#xinputFileN = 'test_input'
 
 inputFile = open(inputFileN, 'r')
 
 directory = inputFile.readline().replace('\n', '')
 
 for storyID in inputFile:
-    storyID = storyID.replace('\n', '')
+    storyID = storyID.replace('\n', '').replace('.story', '')
     storyFile = open(directory+'/'+storyID+'.story', 'r')
     qFile = open(directory+'/'+storyID+'.questions', 'r')
 
