@@ -22,8 +22,16 @@ def isplural(word):
     plural = True if word is not lemma else False
     return plural, lemma
 
+
+def lexsense(word, context='') :
+    if context:
+        sense = lesk(context,word);
+        if sense:
+            return set(sense)
+
+    return wn.synsets(word, pos=wn.NOUN)
+
 def lexclass(word, context=''):
-    # TODO: word sense disambiguation, pass optional context to lexclass.
     rslt = set()
 
     if context:
@@ -48,13 +56,14 @@ def bagSimilarity(s1, s2) :
     total /= (len(s1)*len(s2))
     return total
 
-def semanticDist(texts1, texts2):
+
+def semSim(texts1, texts2):
     s1 = set()
     s2 = set()
 
     for t in texts1:
         for q in t.split():
-            s1 |= lexclass(q, t)
+            s1 |= lexsense(q, t)
     for t in texts2:
         for q in t.split():
             s2 |= lexclass(q, t)

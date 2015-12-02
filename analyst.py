@@ -113,7 +113,7 @@ class SObj:
         score += maxv*SObj.WORTH['lexsim']*nproper
 
         # Now scale by total semantic distance
-        score /= 1+semanticDist(self.texts, other.texts)
+        score *= semSim(self.texts, other.texts)
         #print(self.texts[0], other.texts[0], score, sep='\t')
 
         return score

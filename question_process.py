@@ -33,11 +33,11 @@ def question_process(q):
     # Make a bag of semantic relation for lch_distance via wordnet    
     semanticbag = set()    
     for w in words:
-        semanticbag |= lexclass(w, text)
+        semanticbag |= lexsense(w, text)
     q['semanticbag'] = semanticbag;
         
     sbarq = tree[0]
-    gap = sbarq.subtrees(filter=lambda n:n.label() in QPOSMAP.keys() ).next()
+    gap = next(sbarq.subtrees(filter=lambda n:n.label() in QPOSMAP.keys() ))
     
     if gap:    
         q['searchtype'] = QPOSMAP[gap.label()];
