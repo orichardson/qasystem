@@ -18,7 +18,7 @@ def makeScorer(q) :
         if 'searchtype' in q and (node.label() ==q['searchtype']) :
             score += 20 ;
             
-        if hasattr(node, 'obj'):
+        if hasattr(node, 'obj') and 'sobj' in q:
             score += 5*node.obj.compatibility(q['sobj'])
             
         leaves = node.leaves()
@@ -42,7 +42,6 @@ def answerQuestions(story, questions):
         labels = st.tag(tree.leaves())
         tagger = maketagger(labels)
         traverse(tree, tagger)
-        print(tree)
 
     for q in questions:
         scorer = makeScorer(q);

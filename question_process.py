@@ -37,9 +37,9 @@ def question_process(q):
     q['semanticbag'] = semanticbag;
         
     sbarq = tree[0]
-    gap = next(sbarq.subtrees(filter=lambda n:n.label() in QPOSMAP.keys() ))
-    
-    if gap:    
+    try:
+        gap = next(sbarq.subtrees(filter=lambda n:n.label() in QPOSMAP.keys() ))
+
         q['searchtype'] = QPOSMAP[gap.label()];
         
         
@@ -76,6 +76,9 @@ def question_process(q):
                 sobj.props['lexname'] = ALL_NOUNS - {'noun.person'}
 
         q['sobj'] = sobj
+        
+    except StopIteration:
+        pass
         
 #Sample test
 #print(question_process("Who did the Queen of England pour mustard on at dinner?"))

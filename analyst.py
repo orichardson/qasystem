@@ -187,7 +187,6 @@ class StoryBuilder:
                 maxsim = v
 
         if maxsim > StoryBuilder.MERGE_THRESHOLD / given.priority:
-            print('merging because of score : ', maxsim, maxo.texts, maxo.props, given.texts, given.props,sep='\n')
             maxo.merge(given)
             return maxo
         else:
@@ -220,7 +219,6 @@ class StoryBuilder:
                 if 'APPOSITIVE' in m :
                     # because it's a postorder traversal, our children already
                     # live in the story obj list...
-                    print('merging because appositive')
                     node[0].obj.merge(node[2].obj)
 
                 if len(list(node.subtrees(filter=lambda x: x.label()=='NP') )) == 1 :
