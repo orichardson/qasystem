@@ -25,7 +25,7 @@ def isplural(word):
 
 def lexsense(word, context='') :
     if context:
-        sense = lesk(context,word);
+        sense = lesk(context,word,pos=wn.NOUN);
         if sense:
             return {sense}
 
@@ -35,7 +35,7 @@ def lexclass(word, context=''):
     rslt = set()
 
     if context:
-        sense = lesk(context,word);
+        sense = lesk(context,word,pos=wn.NOUN);
         if sense:
             rslt.add(sense.lexname())
             return rslt
@@ -54,7 +54,8 @@ def bagSimilarity(s1, s2) :
 
     for a in s1:
         for b in s2:
-            total += wn.lch_similarity(a,b)
+            if(a.pos() == b.pos()) :
+                total += wn.lch_similarity(a,b)
 
     total /= (len(s1)*len(s2))
     return total

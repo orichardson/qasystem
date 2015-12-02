@@ -15,11 +15,13 @@ def makeScorer(q) :
         score = 0;
         #print(q['searchtype'] + '\t'+ nodetext+'\t'+str(q['searchtype']==nodetext));
 
-        if 'searchtype' in q and (nodedata[0] ==q['searchtype']) :
+        if 'searchtype' in q and (node.label() ==q['searchtype']) :
             score += 20 ;
             
         if hasattr(node, 'obj'):
             score += 5*node.obj.compatibility(q['sobj'])
+            
+        leaves = node.leaves()
 
         score /= (20 + len(leaves))
         score /= (10 + len(node.treeposition()))
@@ -49,9 +51,6 @@ def answerQuestions(story, questions):
         sb = analyst.StoryBuilder()
         sb.read(trees)
         
-        tofind = analyst.SObj(sb.story, node)
-        sb.resolve(tofind)
-
         for tree in trees:
             traverse(tree, scorer)
 
