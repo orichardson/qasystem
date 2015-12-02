@@ -47,7 +47,7 @@ def lexclass(word, context=''):
     return rslt
 
 def bagSimilarity(s1, s2) :
-    if(len(s1) == 0 and len(s2) == 0) :
+    if(len(s1) == 0 or len(s2) == 0) :
         return 1
         
     total = 0;
