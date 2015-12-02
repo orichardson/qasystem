@@ -28,7 +28,7 @@ def lexsense(word, context='') :
         if sense:
             return set(sense)
 
-    return wn.synsets(word, pos=wn.NOUN)
+    return set(wn.synsets(word, pos=wn.NOUN))
 
 def lexclass(word, context=''):
     rslt = set()
